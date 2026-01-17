@@ -9,7 +9,16 @@ import {
   Tooltip,
 } from 'recharts';
 
-const SPACE_LABELS = {
+// Color palette for SPACE dimensions
+export const SPACE_COLORS = {
+  S: '#E6A855', // gold
+  P: '#7CB9E8', // sky blue
+  A: '#9ACD32', // yellow-green
+  C: '#E88D8D', // coral
+  E: '#B19CD9', // lavender
+};
+
+export const SPACE_LABELS = {
   S: 'Story',
   P: 'Pageantry',
   A: 'Amusement',
@@ -17,7 +26,7 @@ const SPACE_LABELS = {
   E: 'Emotion',
 };
 
-const SCORE_LABELS = {
+export const SCORE_LABELS = {
   1: 'Below Par',
   2: 'Average',
   3: 'Above Average',
@@ -25,19 +34,22 @@ const SCORE_LABELS = {
   5: 'Era-Defining',
 };
 
-const SpaceRadarChart = ({ scores, size = 300, showLabels = true, showDots = true }) => {
-  const data = Object.entries(SPACE_LABELS).map(([key, label]) => ({
-    axis: showLabels ? label : key,
+const SpaceRadarChart = ({ scores, size = 300, showLabels = true, showDots = true, colorCoded = false }) => {
+  const DIMENSIONS = ['S', 'P', 'A', 'C', 'E'];
+  
+  const data = DIMENSIONS.map((key) => ({
+    key,
+    axis: colorCoded ? key : (showLabels ? SPACE_LABELS[key] : key),
     value: scores[key] || 0,
     fullMark: 5,
   }));
 
   const CustomTooltip = ({ active, payload }) => {
     if (active && payload && payload.length) {
-      const { axis, value } = payload[0].payload;
+      const { key, value } = payload[0].payload;
       return (
         <div className="bg-charcoal border border-gold/30 rounded-lg px-3 py-2 shadow-lg">
-          <p className="text-gold font-display text-sm">{axis}</p>
+          <p className="text-gold font-display text-sm">{SPACE_LABELS[key]}</p>
           <p className="text-cream text-lg font-semibold">
             {value} <span className="text-silver text-sm">/ 5</span>
           </p>
@@ -48,29 +60,63 @@ const SpaceRadarChart = ({ scores, size = 300, showLabels = true, showDots = tru
     return null;
   };
 
+  // Custom tick for color-coded labels with letter inside colored circle
+  const renderColorCodedTick = (props) => {
+    const { x, y, payload } = props;
+    const key = payload.value;
+    const color = SPACE_COLORS[key] || '#d4af37';
+    
+    return (
+      <g>
+        {/* Colored circle background */}
+        <circle
+          cx={x}
+          cy={y}
+          r={14}
+          fill={color}
+        />
+        {/* Letter */}
+        <text
+          x={x}
+          y={y}
+          textAnchor="middle"
+          dominantBaseline="central"
+          fill="#0a0a0f"
+          fontSize={12}
+          fontWeight="bold"
+          fontFamily="Arial, sans-serif"
+        >
+          {key}
+        </text>
+      </g>
+    );
+  };
+
   return (
     <div style={{ width: size, height: size }}>
       <ResponsiveContainer width="100%" height="100%">
-        <RadarChart data={data} margin={{ top: 20, right: 30, bottom: 20, left: 30 }}>
+        <RadarChart data={data} margin={{ top: 25, right: 25, bottom: 25, left: 25 }}>
           <PolarGrid 
             stroke="#2a2a3a" 
             strokeWidth={1}
           />
           <PolarAngleAxis
             dataKey="axis"
-            tick={{ 
+            tick={colorCoded ? renderColorCodedTick : { 
               fill: '#a0a0b0', 
               fontSize: showLabels ? 12 : 14,
               fontFamily: 'Source Sans 3',
             }}
           />
-          <PolarRadiusAxis
-            angle={90}
-            domain={[0, 5]}
-            tick={{ fill: '#a0a0b0', fontSize: 10 }}
-            tickCount={6}
-            axisLine={false}
-          />
+          {!colorCoded && (
+            <PolarRadiusAxis
+              angle={90}
+              domain={[0, 5]}
+              tick={{ fill: '#a0a0b0', fontSize: 10 }}
+              tickCount={6}
+              axisLine={false}
+            />
+          )}
           <Radar
             name="SPACE"
             dataKey="value"
@@ -85,7 +131,7 @@ const SpaceRadarChart = ({ scores, size = 300, showLabels = true, showDots = tru
               strokeWidth: 2,
             } : false}
           />
-          <Tooltip content={<CustomTooltip />} />
+          {!colorCoded && <Tooltip content={<CustomTooltip />} />}
         </RadarChart>
       </ResponsiveContainer>
     </div>
