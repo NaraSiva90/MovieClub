@@ -171,8 +171,8 @@ const ShareableReview = ({ review, onClose }) => {
   };
 
   const dimensions = format === 'square' 
-    ? { width: 540, height: 540 } 
-    : { width: 600, height: 340 };
+    ? { width: 540, height: 580 } 
+    : { width: 600, height: 360 };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -290,7 +290,7 @@ const ShareableReview = ({ review, onClose }) => {
                         </p>
                         {creditsLine && (
                           <p 
-                            className="text-[#a0a0b0] text-xs mt-1 truncate"
+                            className="text-[#a0a0b0] text-xs mt-1 leading-snug"
                             style={{ fontFamily: 'Arial, Helvetica, sans-serif' }}
                           >
                             {creditsLine}
@@ -396,7 +396,7 @@ const ShareableReview = ({ review, onClose }) => {
                       </p>
                       {creditsLine && (
                         <p 
-                          className="text-[#a0a0b0] text-xs mt-0.5 truncate"
+                          className="text-[#a0a0b0] text-xs mt-0.5 leading-snug"
                           style={{ fontFamily: 'Arial, Helvetica, sans-serif' }}
                         >
                           {creditsLine}
