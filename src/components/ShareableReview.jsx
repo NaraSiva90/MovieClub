@@ -173,41 +173,48 @@ const ShareableReview = ({ review, onClose }) => {
       
       {/* Modal */}
       <div className="relative bg-charcoal border border-slate rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto animate-slide-up">
-        {/* Header */}
+        {/* Header with platform toggle */}
         <div className="sticky top-0 bg-charcoal border-b border-slate p-4 flex items-center justify-between z-10">
           <h2 className="font-display text-xl text-cream">Share Your Review</h2>
-          <button
-            onClick={onClose}
-            className="p-2 text-silver hover:text-cream transition-colors"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        </div>
-        
-        {/* Format Toggle */}
-        <div className="p-4 border-b border-slate">
-          <div className="flex gap-2">
+          
+          {/* Platform toggle as icons */}
+          <div className="flex items-center gap-2">
             <button
               onClick={() => setFormat('square')}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+              className={`p-2 rounded-lg transition-colors ${
                 format === 'square'
-                  ? 'bg-gold text-midnight'
+                  ? 'bg-gradient-to-r from-[#833AB4] via-[#FD1D1D] to-[#F77737] text-white'
                   : 'bg-slate/50 text-silver hover:text-cream'
               }`}
+              title="Instagram (Square)"
             >
-              Square (Instagram)
+              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+              </svg>
             </button>
             <button
               onClick={() => setFormat('landscape')}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+              className={`p-2 rounded-lg transition-colors ${
                 format === 'landscape'
-                  ? 'bg-gold text-midnight'
+                  ? 'bg-[#1DA1F2] text-white'
                   : 'bg-slate/50 text-silver hover:text-cream'
               }`}
+              title="X / Twitter (Landscape)"
             >
-              Landscape (Twitter)
+              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+              </svg>
+            </button>
+            
+            <div className="w-px h-6 bg-slate mx-1" />
+            
+            <button
+              onClick={onClose}
+              className="p-2 text-silver hover:text-cream transition-colors"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
             </button>
           </div>
         </div>
@@ -484,76 +491,71 @@ const ShareableReview = ({ review, onClose }) => {
           )}
         </div>
 
-        {/* Actions */}
-        <div className="sticky bottom-0 bg-charcoal border-t border-slate p-4 space-y-3">
-          {/* Primary actions */}
-          <div className="flex gap-3">
-            <button
-              onClick={handleDownload}
-              disabled={generating || posterLoading}
-              className="flex-1 py-3 bg-gold hover:bg-gold-light disabled:bg-gold/50 text-midnight font-semibold rounded-lg transition-colors flex items-center justify-center gap-2"
-            >
-              {generating ? (
-                <div className="w-5 h-5 border-2 border-midnight border-t-transparent rounded-full animate-spin" />
-              ) : (
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                </svg>
-              )}
-              Download
-            </button>
-            <button
-              onClick={handleCopyImage}
-              disabled={generating || posterLoading}
-              className="flex-1 py-3 bg-slate hover:bg-slate/80 disabled:bg-slate/50 text-cream font-semibold rounded-lg transition-colors flex items-center justify-center gap-2"
-            >
-              {copied ? (
-                <>
-                  <svg className="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+        {/* Actions - Compact */}
+        <div className="sticky bottom-0 bg-charcoal border-t border-slate p-3">
+          <div className="flex items-center justify-between gap-3">
+            {/* Left: Status text */}
+            <p className="text-slate text-xs flex-1">
+              {posterError && !posterBase64 
+                ? "Poster unavailable"
+                : format === 'square' ? "Instagram ready" : "X ready"
+              }
+            </p>
+            
+            {/* Right: Action buttons */}
+            <div className="flex items-center gap-2">
+              <button
+                onClick={handleCopyImage}
+                disabled={generating || posterLoading}
+                className="px-3 py-2 bg-slate/50 hover:bg-slate disabled:bg-slate/30 text-cream text-sm font-medium rounded-lg transition-colors flex items-center gap-1.5"
+                title="Copy to clipboard"
+              >
+                {copied ? (
+                  <>
+                    <svg className="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    Copied
+                  </>
+                ) : (
+                  <>
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                    </svg>
+                    Copy
+                  </>
+                )}
+              </button>
+              
+              <button
+                onClick={handleDownload}
+                disabled={generating || posterLoading}
+                className="px-4 py-2 bg-gold hover:bg-gold-light disabled:bg-gold/50 text-midnight text-sm font-semibold rounded-lg transition-colors flex items-center gap-1.5"
+              >
+                {generating ? (
+                  <div className="w-4 h-4 border-2 border-midnight border-t-transparent rounded-full animate-spin" />
+                ) : (
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                   </svg>
-                  Copied!
-                </>
-              ) : (
-                <>
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                )}
+                Download
+              </button>
+              
+              {format === 'landscape' && (
+                <button
+                  onClick={handleShareTwitter}
+                  className="px-3 py-2 bg-[#1DA1F2] hover:bg-[#1a8cd8] text-white text-sm font-medium rounded-lg transition-colors flex items-center gap-1.5"
+                  title="Open X with pre-filled text"
+                >
+                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
                   </svg>
-                  Copy Image
-                </>
+                  Post
+                </button>
               )}
-            </button>
+            </div>
           </div>
-          
-          {/* Social sharing */}
-          <div className="flex gap-3">
-            <button
-              onClick={handleShareTwitter}
-              className="flex-1 py-3 bg-[#1DA1F2]/20 hover:bg-[#1DA1F2]/30 text-[#1DA1F2] font-semibold rounded-lg transition-colors flex items-center justify-center gap-2"
-            >
-              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
-              </svg>
-              Share on X
-            </button>
-            <button
-              onClick={handleDownload}
-              disabled={generating || posterLoading}
-              className="flex-1 py-3 bg-gradient-to-r from-[#833AB4]/20 via-[#FD1D1D]/20 to-[#F77737]/20 hover:from-[#833AB4]/30 hover:via-[#FD1D1D]/30 hover:to-[#F77737]/30 text-[#E1306C] font-semibold rounded-lg transition-colors flex items-center justify-center gap-2"
-            >
-              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
-              </svg>
-              Download for Instagram
-            </button>
-          </div>
-          
-          <p className="text-center text-slate text-xs">
-            {posterError && !posterBase64 
-              ? "Note: Poster couldn't be embedded. The share image will use a placeholder."
-              : "Download the image, then share to Instagram Stories or post"
-            }
-          </p>
         </div>
       </div>
     </div>
