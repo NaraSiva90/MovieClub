@@ -148,14 +148,23 @@ const SpaceReviewForm = ({ movie, onSubmit, onCancel, existingReview }) => {
 
         {/* Optional text review */}
         <div className="space-y-2">
-          <label className="text-cream font-medium">Notes (optional)</label>
+          <div className="flex justify-between items-baseline">
+            <label className="text-cream font-medium">Notes (optional)</label>
+            <span className={`text-xs ${text.length > 280 ? 'text-red-400' : text.length > 240 ? 'text-gold' : 'text-slate'}`}>
+              {text.length}/280
+            </span>
+          </div>
           <textarea
             value={text}
-            onChange={(e) => setText(e.target.value)}
+            onChange={(e) => setText(e.target.value.slice(0, 280))}
             placeholder="Any thoughts on why you scored it this way..."
             rows={3}
+            maxLength={280}
             className="w-full bg-charcoal border border-slate rounded-lg px-4 py-3 text-cream placeholder-silver/50 focus:border-gold focus:outline-none transition-colors resize-none"
           />
+          <p className="text-slate text-xs">
+            Keep it punchy—this appears in your shareable images.
+          </p>
         </div>
 
         {/* Actions */}
