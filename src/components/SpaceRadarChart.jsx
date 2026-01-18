@@ -108,15 +108,13 @@ const SpaceRadarChart = ({ scores, size = 300, showLabels = true, showDots = tru
               fontFamily: 'Source Sans 3',
             }}
           />
-          {!colorCoded && (
-            <PolarRadiusAxis
-              angle={90}
-              domain={[0, 5]}
-              tick={{ fill: '#a0a0b0', fontSize: 10 }}
-              tickCount={6}
-              axisLine={false}
-            />
-          )}
+          <PolarRadiusAxis
+            angle={90}
+            domain={[0, 5]}
+            tick={colorCoded ? false : { fill: '#a0a0b0', fontSize: 10 }}
+            tickCount={6}
+            axisLine={false}
+          />
           <Radar
             name="SPACE"
             dataKey="value"
