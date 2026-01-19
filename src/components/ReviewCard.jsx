@@ -12,11 +12,6 @@ const ReviewCard = ({ review, onEdit, onDelete, onShare }) => {
   
   // SPACE dimension order
   const SPACE_ORDER = ['S', 'P', 'A', 'C', 'E'];
-  
-  // Truncate review text for display (150 chars)
-  const truncatedText = text && text.length > 150 
-    ? text.substring(0, 150).trim() + '...' 
-    : text;
 
   return (
     <div className="bg-charcoal border border-slate rounded-xl overflow-hidden hover:border-gold/30 transition-colors animate-slide-up">
@@ -47,8 +42,8 @@ const ReviewCard = ({ review, onEdit, onDelete, onShare }) => {
                 {languageName && ` • ${languageName}`}
               </p>
               
-              {/* Credits */}
-              <div className="text-slate text-xs mt-2 space-y-0.5">
+              {/* Credits - increased contrast */}
+              <div className="text-silver text-xs mt-2 space-y-0.5">
                 {directors.length > 0 && (
                   <p>Dir: {directors.join(', ')}</p>
                 )}
@@ -64,10 +59,10 @@ const ReviewCard = ({ review, onEdit, onDelete, onShare }) => {
             </div>
           </div>
           
-          {/* Review Text */}
-          {truncatedText && (
+          {/* Review Text - full text, no truncation */}
+          {text && (
             <p className="text-silver text-sm mt-4 leading-relaxed italic">
-              "{truncatedText}"
+              "{text}"
             </p>
           )}
         </div>

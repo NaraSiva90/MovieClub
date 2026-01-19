@@ -13,15 +13,8 @@ const ShareableReview = ({ review, onClose }) => {
 
   const { movieData, scores, text } = review;
 
-  // Truncate review text for shareable (180 chars for square, 120 for landscape)
-  const truncateText = (str, limit) => {
-    if (!str) return null;
-    if (str.length <= limit) return str;
-    return str.substring(0, limit).trim() + '...';
-  };
-  
-  const reviewTextSquare = truncateText(text, 180);
-  const reviewTextLandscape = truncateText(text, 100);
+  // Use full review text (already limited to 280 chars at input)
+  const reviewText = text;
 
   // Extract credits info
   const { processedCredits, languageName } = movieData;
@@ -161,8 +154,8 @@ const ShareableReview = ({ review, onClose }) => {
   };
 
   const dimensions = format === 'square' 
-    ? { width: 600, height: 700 } 
-    : { width: 720, height: 420 };
+    ? { width: 600, height: 780 } 
+    : { width: 720, height: 480 };
 
   // SPACE dimension order
   const SPACE_ORDER = ['S', 'P', 'A', 'C', 'E'];
@@ -282,7 +275,7 @@ const ShareableReview = ({ review, onClose }) => {
                       </p>
                       {creditsLine && (
                         <p 
-                          className="text-[#707080] text-xs mt-1 leading-relaxed"
+                          className="text-[#a0a0b0] text-xs mt-1 leading-relaxed"
                           style={{ fontFamily: 'Arial, Helvetica, sans-serif' }}
                         >
                           {creditsLine}
@@ -357,13 +350,13 @@ const ShareableReview = ({ review, onClose }) => {
                   </div>
                   
                   {/* Review Text */}
-                  {reviewTextSquare && (
+                  {reviewText && (
                     <div className="mt-4 pt-4 border-t border-[#2a2a3a]">
                       <p 
                         className="text-[#a0a0b0] text-sm italic leading-relaxed"
                         style={{ fontFamily: 'Georgia, "Times New Roman", Times, serif' }}
                       >
-                        "{reviewTextSquare}"
+                        "{reviewText}"
                       </p>
                     </div>
                   )}
@@ -484,12 +477,12 @@ const ShareableReview = ({ review, onClose }) => {
                     </div>
                     
                     {/* Review Text */}
-                    {reviewTextLandscape && (
+                    {reviewText && (
                       <p 
-                        className="text-[#909090] text-xs italic mt-2 leading-relaxed"
+                        className="text-[#a0a0b0] text-xs italic mt-2 leading-relaxed"
                         style={{ fontFamily: 'Georgia, "Times New Roman", Times, serif' }}
                       >
-                        "{reviewTextLandscape}"
+                        "{reviewText}"
                       </p>
                     )}
                     
