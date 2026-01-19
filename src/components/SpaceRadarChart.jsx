@@ -95,7 +95,11 @@ const SpaceRadarChart = ({ scores, size = 300, showLabels = true, showDots = tru
   return (
     <div style={{ width: size, height: size }}>
       <ResponsiveContainer width="100%" height="100%">
-        <RadarChart data={data} margin={{ top: 25, right: 25, bottom: 25, left: 25 }}>
+        <RadarChart 
+          data={data} 
+          margin={{ top: 25, right: 25, bottom: 25, left: 25 }}
+          outerRadius="70%"
+        >
           <PolarGrid 
             stroke="#2a2a3a" 
             strokeWidth={1}
@@ -114,6 +118,7 @@ const SpaceRadarChart = ({ scores, size = 300, showLabels = true, showDots = tru
             tick={colorCoded ? false : { fill: '#a0a0b0', fontSize: 10 }}
             tickCount={6}
             axisLine={false}
+            scale="linear"
           />
           <Radar
             name="SPACE"
