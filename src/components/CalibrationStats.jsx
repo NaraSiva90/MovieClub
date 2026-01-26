@@ -1,11 +1,11 @@
 import React from 'react';
 
 const SCORE_CONFIG = [
-  { score: 5, label: 'Era-Defining', target: '0-5%', color: 'bg-yellow-400' },
-  { score: 4, label: 'Superlative', target: '5-15%', color: 'bg-yellow-500' },
-  { score: 3, label: 'Above Average', target: '20-35%', color: 'bg-yellow-600' },
-  { score: 2, label: 'Average', target: '35-50%', color: 'bg-yellow-700' },
-  { score: 1, label: 'Below Par', target: '10-20%', color: 'bg-yellow-800' },
+  { score: 5, label: 'Era-Defining', target: '~2%', color: 'bg-yellow-400' },
+  { score: 4, label: 'Superlative', target: '~8%', color: 'bg-yellow-500' },
+  { score: 3, label: 'Above Average', target: '~20%', color: 'bg-yellow-600' },
+  { score: 2, label: 'Average', target: '~30%', color: 'bg-yellow-700' },
+  { score: 1, label: 'Below Par', target: '~40%', color: 'bg-yellow-800' },
 ];
 
 const CalibrationStats = ({ calibration, percentages, nudge }) => {
@@ -54,7 +54,9 @@ const CalibrationStats = ({ calibration, percentages, nudge }) => {
       {nudge && (
         <div
           className={`p-4 rounded-lg border ${
-            nudge.type === 'warning'
+            nudge.type === 'error'
+              ? 'bg-red-900/20 border-red-500/30 text-red-200'
+              : nudge.type === 'warning'
               ? 'bg-amber-900/20 border-amber-500/30 text-amber-200'
               : nudge.type === 'success'
               ? 'bg-emerald-900/20 border-emerald-500/30 text-emerald-200'
