@@ -226,6 +226,120 @@ export const useLocalReviews = () => {
     localStorage.setItem(CALIBRATION_KEY, JSON.stringify(newCalibration));
   }, [reviews, recalculateCalibration]);
 
+  // Calculate mode for a single SPACE dimension from an array of scores
+  const calculateMode = useCallback((scores) => {
+    if (scores.length === 0) return null;
+    
+    const frequency = {};
+    scores.forEach(score => {
+      frequency[score] = (frequency[score] || 0) + 1;
+    });
+    
+    let maxFreq = 0;
+    let mode = null;
+    Object.entries(frequency).forEach(([score, freq]) => {
+      if (freq > maxFreq) {
+        maxFreq = freq;
+        mode = parseInt(score);
+      }
+    });
+    
+    return mode;
+  }, []);
+
+  // Calculate SPACE modes from a list of reviews
+  const calculateSpaceModes = useCallback((reviewsList) => {
+    if (reviewsList.length === 0) return null;
+    
+    const dimensions = ['S', 'P', 'A', 'C', 'E'];
+    const modes = {};
+    
+    dimensions.forEach(dim => {
+      const scores = reviewsList.map(r => r.scores[dim]).filter(s => s != null);
+      modes[dim] = calculateMode(scores);
+    });
+    
+    // Check if we got valid modes for all dimensions
+    if (Object.values(modes).some(m => m === null)) return null;
+    
+    return modes;
+  }, [calculateMode]);
+
+  // Get reviews filtered by language and/or genre
+  const getFilteredReviews = useCallback((language, genres) => {
+    const allReviews = Object.values(reviews);
+    
+    return allReviews.filter(review => {
+      const movieData = review.movieData;
+      
+      // Language match
+      const langMatch = !language || movieData.original_language === language;
+      
+      // Genre match (if movie has any of the specified genres)
+      const movieGenres = movieData.genres?.map(g => g.id) || [];
+      const genreMatch = !genres || genres.length === 0 || 
+        genres.some(gId => movieGenres.includes(gId));
+      
+      return langMatch && genreMatch;
+    });
+  }, [reviews]);
+
+  // Get benchmark modes for a specific movie
+  // Returns: { genreMode, overallMode, genreModeLabel }
+  const getBenchmarkModes = useCallback((movieData) => {
+    const MIN_SAMPLES = 3;
+    const allReviews = Object.values(reviews);
+    
+    // Overall mode (all user's reviews)
+    const overallMode = allReviews.length >= MIN_SAMPLES 
+      ? calculateSpaceModes(allReviews) 
+      : null;
+    
+    // Extract movie's language and genres
+    const language = movieData?.original_language;
+    const genres = movieData?.genres?.map(g => g.id) || [];
+    const genreNames = movieData?.genres?.map(g => g.name) || [];
+    
+    // Try language + genre combo first
+    let genreMode = null;
+    let genreModeLabel = null;
+    
+    if (language && genres.length > 0) {
+      // Try primary genre + language
+      const langGenreReviews = getFilteredReviews(language, [genres[0]]);
+      if (langGenreReviews.length >= MIN_SAMPLES) {
+        genreMode = calculateSpaceModes(langGenreReviews);
+        const langName = movieData.languageName || language.toUpperCase();
+        genreModeLabel = `${langName} ${genreNames[0]}`;
+      }
+    }
+    
+    // Fallback: language only
+    if (!genreMode && language) {
+      const langReviews = getFilteredReviews(language, null);
+      if (langReviews.length >= MIN_SAMPLES) {
+        genreMode = calculateSpaceModes(langReviews);
+        genreModeLabel = movieData.languageName || language.toUpperCase();
+      }
+    }
+    
+    // Fallback: genre only (any language)
+    if (!genreMode && genres.length > 0) {
+      const genreReviews = getFilteredReviews(null, [genres[0]]);
+      if (genreReviews.length >= MIN_SAMPLES) {
+        genreMode = calculateSpaceModes(genreReviews);
+        genreModeLabel = genreNames[0];
+      }
+    }
+    
+    return {
+      genreMode,
+      genreModeLabel,
+      overallMode,
+      overallCount: allReviews.length,
+    };
+  }, [reviews, calculateSpaceModes, getFilteredReviews]);
+
   return {
     reviews,
     calibration,
@@ -236,5 +350,6 @@ export const useLocalReviews = () => {
     getCalibrationPercentages,
     getCalibrationNudge,
     loadSeedData,
+    getBenchmarkModes,
   };
 };

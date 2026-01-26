@@ -1,7 +1,7 @@
 import React from 'react';
 import SpaceRadarChart, { SPACE_COLORS, SPACE_LABELS, SCORE_LABELS } from './SpaceRadarChart';
 
-const ReviewCard = ({ review, onEdit, onDelete, onShare }) => {
+const ReviewCard = ({ review, onEdit, onDelete, onShare, benchmarks }) => {
   const { movieData, scores, text, createdAt } = review;
   
   // Extract credits info
@@ -12,6 +12,12 @@ const ReviewCard = ({ review, onEdit, onDelete, onShare }) => {
   
   // SPACE dimension order
   const SPACE_ORDER = ['S', 'P', 'A', 'C', 'E'];
+  
+  // Extract benchmarks if provided
+  const genreMode = benchmarks?.genreMode || null;
+  const genreModeLabel = benchmarks?.genreModeLabel || null;
+  const overallMode = benchmarks?.overallMode || null;
+  const hasBenchmarks = genreMode || overallMode;
 
   return (
     <div className="bg-charcoal border border-slate rounded-xl overflow-hidden hover:border-gold/30 transition-colors animate-slide-up">
@@ -42,6 +48,13 @@ const ReviewCard = ({ review, onEdit, onDelete, onShare }) => {
                 {languageName && ` • ${languageName}`}
               </p>
               
+              {/* Genres */}
+              {movieData.genres && movieData.genres.length > 0 && (
+                <p className="text-slate text-xs mt-1">
+                  {movieData.genres.map(g => g.name).join(', ')}
+                </p>
+              )}
+              
               {/* Credits - increased contrast */}
               <div className="text-silver text-xs mt-2 space-y-0.5">
                 {directors.length > 0 && (
@@ -68,20 +81,25 @@ const ReviewCard = ({ review, onEdit, onDelete, onShare }) => {
         </div>
         
         {/* Right Column: Radar + SPACE Legend */}
-        <div className="md:w-72 p-5 md:border-l border-t md:border-t-0 border-slate bg-midnight/30">
-          {/* Color-coded Radar Chart */}
-          <div className="flex justify-center mb-4">
+        <div className="md:w-80 p-5 md:border-l border-t md:border-t-0 border-slate bg-midnight/30">
+          {/* Color-coded Radar Chart with benchmarks */}
+          <div className="flex justify-center">
             <SpaceRadarChart 
               scores={scores} 
-              size={140} 
+              size={hasBenchmarks ? 200 : 160} 
               showLabels={true} 
               showDots={false} 
               colorCoded={true}
+              genreMode={genreMode}
+              genreModeLabel={genreModeLabel}
+              overallMode={overallMode}
+              showBenchmarks={hasBenchmarks}
+              showLegend={hasBenchmarks}
             />
           </div>
           
           {/* SPACE Legend */}
-          <div className="space-y-2">
+          <div className="space-y-2 mt-3">
             {SPACE_ORDER.map((key) => {
               const score = scores[key];
               const color = SPACE_COLORS[key];

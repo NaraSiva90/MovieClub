@@ -21,6 +21,7 @@ const App = () => {
     getCalibrationPercentages,
     getCalibrationNudge,
     loadSeedData,
+    getBenchmarkModes,
   } = useLocalReviews();
 
   const [view, setView] = useState('home'); // 'home' | 'review' | 'my-reviews'
@@ -313,6 +314,7 @@ const App = () => {
                       onEdit={handleEditReview}
                       onDelete={handleDeleteReview}
                       onShare={handleShareReview}
+                      benchmarks={getBenchmarkModes(review.movieData)}
                     />
                   ))
                 )}

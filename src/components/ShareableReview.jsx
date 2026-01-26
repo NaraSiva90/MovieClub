@@ -155,7 +155,7 @@ const ShareableReview = ({ review, onClose }) => {
 
   const dimensions = format === 'square' 
     ? { width: 600, height: 780 } 
-    : { width: 680, height: 340 };
+    : { width: 640, height: 280 };
 
   // SPACE dimension order
   const SPACE_ORDER = ['S', 'P', 'A', 'C', 'E'];
@@ -385,47 +385,45 @@ const ShareableReview = ({ review, onClose }) => {
                   </div>
                 </div>
               ) : (
-                /* Landscape Layout (Twitter) - Tighter design */
-                <div className="relative h-full p-4 flex gap-3">
-                  {/* Left Column: Poster + Branding */}
-                  <div className="flex flex-col items-center gap-2">
-                    {(posterBase64 || posterUrl) && (
-                      <div className="flex-shrink-0">
-                        {posterBase64 ? (
-                          <img
-                            src={posterBase64}
-                            alt={movieData.title}
-                            className="w-20 h-30 object-cover rounded shadow-lg"
-                          />
-                        ) : (
-                          <div className="w-20 h-30 rounded shadow-lg bg-gradient-to-br from-[#2a2a3a] to-[#1a1a24] flex items-center justify-center border border-[#3a3a4a]">
-                            <svg className="w-8 h-8 text-[#4a4a5a]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z" />
-                            </svg>
-                          </div>
-                        )}
-                      </div>
-                    )}
+                /* Landscape Layout (Twitter) - 3 Column: Poster | Radar+Brand | Info */
+                <div className="relative h-full p-4 flex">
+                  {/* Column 1: Poster */}
+                  <div className="flex-shrink-0 flex items-center">
+                    {(posterBase64 || posterUrl) ? (
+                      posterBase64 ? (
+                        <img
+                          src={posterBase64}
+                          alt={movieData.title}
+                          className="w-24 h-36 object-cover rounded shadow-lg"
+                        />
+                      ) : (
+                        <div className="w-24 h-36 rounded shadow-lg bg-gradient-to-br from-[#2a2a3a] to-[#1a1a24] flex items-center justify-center border border-[#3a3a4a]">
+                          <svg className="w-8 h-8 text-[#4a4a5a]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z" />
+                          </svg>
+                        </div>
+                      )
+                    ) : null}
                   </div>
                   
-                  {/* Middle Column: Radar Chart + Branding */}
-                  <div className="flex flex-col items-center justify-center">
+                  {/* Column 2: Radar + Branding */}
+                  <div className="flex flex-col items-center justify-center px-3">
                     <SpaceRadarChart 
                       scores={scores} 
-                      size={150} 
+                      size={180} 
                       showLabels={true} 
                       showDots={false} 
                       colorCoded={true}
                     />
                     {/* Branding under radar */}
-                    <div className="flex items-center gap-1.5 mt-1">
+                    <div className="flex items-center gap-1.5 -mt-2">
                       <div className="w-5 h-5 rounded-full bg-[#d4af37]/20 flex items-center justify-center">
                         <svg className="w-2.5 h-2.5 text-[#d4af37]" viewBox="0 0 24 24" fill="currentColor">
                           <polygon points="12,2 15,8 22,9 17,14 18,21 12,18 6,21 7,14 2,9 9,8" />
                         </svg>
                       </div>
                       <span 
-                        className="text-[#f5f5f0] text-xs font-bold"
+                        className="text-[#f5f5f0] text-sm font-bold"
                         style={{ fontFamily: 'Georgia, "Times New Roman", Times, serif' }}
                       >
                         Movie Club
@@ -433,63 +431,50 @@ const ShareableReview = ({ review, onClose }) => {
                     </div>
                   </div>
                   
-                  {/* Right Column: Info + Legend + Review */}
-                  <div className="flex-1 flex flex-col justify-center min-w-0 py-1">
-                    {/* Title & Credits */}
+                  {/* Column 3: Info + Scores + Review */}
+                  <div className="flex-1 flex flex-col justify-center min-w-0 pl-2">
+                    {/* Title */}
                     <h3 
-                      className="text-[#f5f5f0] text-base font-bold leading-tight"
+                      className="text-[#f5f5f0] text-lg font-bold leading-tight"
                       style={{ fontFamily: 'Georgia, "Times New Roman", Times, serif' }}
                     >
                       {movieData.title}
                     </h3>
-                    <p className="text-[#a0a0b0] text-xs mt-0.5">
+                    
+                    {/* Year & Language */}
+                    <p className="text-[#a0a0b0] text-sm mt-0.5">
                       {movieData.release_date?.split('-')[0]}
                       {languageName && ` • ${languageName}`}
                     </p>
+                    
+                    {/* Credits */}
                     {creditsLine && (
-                      <p className="text-[#808090] text-xs mt-0.5">
+                      <p 
+                        className="text-[#808090] text-xs mt-1 leading-snug"
+                        style={{ fontFamily: 'Arial, Helvetica, sans-serif' }}
+                      >
                         {creditsLine}
                       </p>
                     )}
                     
-                    {/* Compact SPACE Legend */}
-                    <div className="mt-2 space-y-0.5">
+                    {/* SPACE Scores - Compact Row */}
+                    <div 
+                      className="flex items-center gap-3 mt-3 py-2 border-t border-b border-[#2a2a3a]"
+                      style={{ fontFamily: 'Arial, Helvetica, sans-serif' }}
+                    >
                       {SPACE_ORDER.map((key) => {
                         const score = scores[key];
                         const color = SPACE_COLORS[key];
-                        const label = SPACE_LABELS[key];
-                        const meaning = SCORE_LABELS[score];
-                        
                         return (
-                          <div key={key} className="flex items-center gap-1.5">
-                            <div 
-                              className="w-4 h-4 rounded-full flex items-center justify-center flex-shrink-0"
-                              style={{ backgroundColor: color }}
-                            >
-                              <span 
-                                className="text-[#0a0a0f] font-bold"
-                                style={{ fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '9px' }}
-                              >
-                                {key}
-                              </span>
-                            </div>
+                          <div key={key} className="flex items-center gap-1">
                             <span 
-                              className="text-[#f5f5f0] text-xs w-16"
-                              style={{ fontFamily: 'Arial, Helvetica, sans-serif' }}
+                              className="font-bold text-sm"
+                              style={{ color }}
                             >
-                              {label}
+                              {key}
                             </span>
-                            <span 
-                              className="text-[#d4af37] font-bold text-xs w-3"
-                              style={{ fontFamily: 'Arial, Helvetica, sans-serif' }}
-                            >
+                            <span className="text-[#f5f5f0] text-sm font-semibold">
                               {score}
-                            </span>
-                            <span 
-                              className="text-[#707080] text-xs"
-                              style={{ fontFamily: 'Arial, Helvetica, sans-serif' }}
-                            >
-                              {meaning}
                             </span>
                           </div>
                         );
@@ -499,7 +484,7 @@ const ShareableReview = ({ review, onClose }) => {
                     {/* Review Text */}
                     {reviewText && (
                       <p 
-                        className="text-[#a0a0b0] text-xs italic mt-2 leading-snug line-clamp-3"
+                        className="text-[#a0a0b0] text-xs italic mt-2 leading-snug flex-1"
                         style={{ fontFamily: 'Georgia, "Times New Roman", Times, serif' }}
                       >
                         "{reviewText}"
@@ -507,9 +492,9 @@ const ShareableReview = ({ review, onClose }) => {
                     )}
                     
                     {/* TMDB attribution */}
-                    <div className="mt-auto pt-1">
+                    <div className="mt-auto">
                       <span className="text-[#505060] text-xs">
-                        Film data: TMDB
+                        TMDB
                       </span>
                     </div>
                   </div>
