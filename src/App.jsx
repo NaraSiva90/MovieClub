@@ -214,23 +214,23 @@ const App = () => {
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
                   <span className="text-cream">5 — Era-Defining</span>
-                  <span className="text-silver">Top 1%. One or two per decade.</span>
+                  <span className="text-silver">Top 1-2%. One or two per decade.</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-cream">4 — Superlative</span>
-                  <span className="text-silver">Top 5%. Excellent.</span>
+                  <span className="text-silver">90th-99th percentile. Rare, outstanding.</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-cream">3 — Above Average</span>
-                  <span className="text-silver">75th-95th percentile.</span>
+                  <span className="text-silver">70th-90th percentile. Clearly better than most.</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-cream">2 — Average</span>
-                  <span className="text-silver">40th-75th percentile. Most films.</span>
+                  <span className="text-silver">40th-70th percentile. Competent, unremarkable.</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-cream">1 — Below Par</span>
-                  <span className="text-silver">Bottom 40%.</span>
+                  <span className="text-silver">Bottom 40%. Falls short of expectations.</span>
                 </div>
               </div>
             </div>
