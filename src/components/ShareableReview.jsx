@@ -154,8 +154,8 @@ const ShareableReview = ({ review, onClose }) => {
   };
 
   const dimensions = format === 'square' 
-    ? { width: 600, height: 720 } 
-    : { width: 640, height: 280 };
+    ? { width: 600, height: 750 } 
+    : { width: 600, height: 380 };
 
   // SPACE dimension order
   const SPACE_ORDER = ['S', 'P', 'A', 'C', 'E'];
@@ -342,7 +342,7 @@ const ShareableReview = ({ review, onClose }) => {
                     <div className="flex-1 flex items-center justify-center">
                       <SpaceRadarChart 
                         scores={scores} 
-                        size={240} 
+                        size={280} 
                         showLabels={true} 
                         showDots={false} 
                         colorCoded={true}
@@ -390,118 +390,124 @@ const ShareableReview = ({ review, onClose }) => {
                   </div>
                 </div>
               ) : (
-                /* Landscape Layout (Twitter) - 3 Column: Poster | Radar+Brand | Info */
-                <div className="relative h-full p-4 flex">
-                  {/* Column 1: Poster */}
-                  <div className="flex-shrink-0 flex items-center">
-                    {(posterBase64 || posterUrl) ? (
-                      posterBase64 ? (
-                        <img
-                          src={posterBase64}
-                          alt={movieData.title}
-                          className="w-24 h-36 object-cover rounded shadow-lg"
-                        />
-                      ) : (
-                        <div className="w-24 h-36 rounded shadow-lg bg-gradient-to-br from-[#2a2a3a] to-[#1a1a24] flex items-center justify-center border border-[#3a3a4a]">
-                          <svg className="w-8 h-8 text-[#4a4a5a]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z" />
-                          </svg>
-                        </div>
-                      )
-                    ) : null}
-                  </div>
-                  
-                  {/* Column 2: Radar + Branding */}
-                  <div className="flex flex-col items-center justify-center px-3">
-                    <SpaceRadarChart 
-                      scores={scores} 
-                      size={180} 
-                      showLabels={true} 
-                      showDots={false} 
-                      colorCoded={true}
-                    />
-                    {/* Branding under radar */}
-                    <div className="flex items-center gap-1.5 -mt-2">
-                      <div className="w-5 h-5 rounded-full bg-[#d4af37]/20 flex items-center justify-center">
-                        <svg className="w-2.5 h-2.5 text-[#d4af37]" viewBox="0 0 24 24" fill="currentColor">
-                          <polygon points="12,2 15,8 22,9 17,14 18,21 12,18 6,21 7,14 2,9 9,8" />
-                        </svg>
-                      </div>
-                      <span 
-                        className="text-[#f5f5f0] text-sm font-bold"
-                        style={{ fontFamily: 'Georgia, "Times New Roman", Times, serif' }}
-                      >
-                        Movie Club
-                      </span>
-                    </div>
-                  </div>
-                  
-                  {/* Column 3: Info + Scores + Review */}
-                  <div className="flex-1 flex flex-col justify-center min-w-0 pl-2">
-                    {/* Title */}
+                /* Landscape Layout (Twitter) - Header | 2 Columns | Footer */
+                <div className="relative h-full flex flex-col">
+                  {/* Header: Movie info */}
+                  <div className="px-4 py-3 border-b border-[#2a2a3a]">
                     <h3 
                       className="text-[#f5f5f0] text-lg font-bold leading-tight"
                       style={{ fontFamily: 'Georgia, "Times New Roman", Times, serif' }}
                     >
                       {movieData.title}
                     </h3>
-                    
-                    {/* Year & Language */}
-                    <p className="text-[#a0a0b0] text-sm mt-0.5">
-                      {movieData.release_date?.split('-')[0]}
-                      {languageName && ` • ${languageName}`}
+                    <p className="text-[#a0a0b0] text-xs mt-0.5">
+                      {languageName || 'English'}
+                      {movieData.genres && movieData.genres.length > 0 && ` • ${movieData.genres.slice(0, 2).map(g => g.name).join(', ')}`}
+                      {creditsLine && ` • ${creditsLine}`}
                     </p>
-                    
-                    {/* Credits */}
-                    {creditsLine && (
-                      <p 
-                        className="text-[#808090] text-xs mt-1 leading-snug"
-                        style={{ fontFamily: 'Arial, Helvetica, sans-serif' }}
-                      >
-                        {creditsLine}
-                      </p>
-                    )}
-                    
-                    {/* SPACE Scores - Compact Row */}
-                    <div 
-                      className="flex items-center gap-3 mt-3 py-2 border-t border-b border-[#2a2a3a]"
-                      style={{ fontFamily: 'Arial, Helvetica, sans-serif' }}
-                    >
-                      {SPACE_ORDER.map((key) => {
-                        const score = scores[key];
-                        const color = SPACE_COLORS[key];
-                        return (
-                          <div key={key} className="flex items-center gap-1">
-                            <span 
-                              className="font-bold text-sm"
-                              style={{ color }}
-                            >
-                              {key}
-                            </span>
-                            <span className="text-[#f5f5f0] text-sm font-semibold">
-                              {score}
-                            </span>
-                          </div>
-                        );
-                      })}
+                  </div>
+                  
+                  {/* Main: 2 Columns */}
+                  <div className="flex-1 flex">
+                    {/* Left Column: Poster + Review */}
+                    <div className="flex flex-col p-3 border-r border-[#2a2a3a]" style={{ width: '45%' }}>
+                      {/* Poster */}
+                      <div className="flex-shrink-0 mb-2">
+                        {(posterBase64 || posterUrl) ? (
+                          posterBase64 ? (
+                            <img
+                              src={posterBase64}
+                              alt={movieData.title}
+                              className="w-20 h-30 object-cover rounded shadow-lg"
+                            />
+                          ) : (
+                            <div className="w-20 h-30 rounded shadow-lg bg-gradient-to-br from-[#2a2a3a] to-[#1a1a24] flex items-center justify-center border border-[#3a3a4a]">
+                              <svg className="w-8 h-8 text-[#4a4a5a]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z" />
+                              </svg>
+                            </div>
+                          )
+                        ) : null}
+                      </div>
+                      
+                      {/* Review Text */}
+                      {reviewText && (
+                        <p 
+                          className="text-[#a0a0b0] text-xs italic leading-snug flex-1"
+                          style={{ fontFamily: 'Georgia, "Times New Roman", Times, serif' }}
+                        >
+                          "{reviewText}"
+                        </p>
+                      )}
                     </div>
                     
-                    {/* Review Text */}
-                    {reviewText && (
-                      <p 
-                        className="text-[#a0a0b0] text-xs italic mt-2 leading-snug flex-1"
+                    {/* Right Column: Radar + SPACE Legend */}
+                    <div className="flex-1 flex flex-col p-3">
+                      {/* Radar Chart */}
+                      <div className="flex justify-center">
+                        <SpaceRadarChart 
+                          scores={scores} 
+                          size={160} 
+                          showLabels={true} 
+                          showDots={false} 
+                          colorCoded={true}
+                        />
+                      </div>
+                      
+                      {/* SPACE Legend */}
+                      <div className="space-y-1 mt-1">
+                        {SPACE_ORDER.map((key) => {
+                          const score = scores[key];
+                          const color = SPACE_COLORS[key];
+                          const label = SPACE_LABELS[key];
+                          const meaning = SCORE_LABELS[score];
+                          
+                          return (
+                            <div key={key} className="flex items-center gap-1.5">
+                              <span 
+                                className="font-bold text-xs w-3"
+                                style={{ color, fontFamily: 'Arial, Helvetica, sans-serif' }}
+                              >
+                                {key}
+                              </span>
+                              <span className="text-[#707080] text-xs">-</span>
+                              <span 
+                                className="text-[#f5f5f0] text-xs"
+                                style={{ fontFamily: 'Arial, Helvetica, sans-serif' }}
+                              >
+                                {label}:
+                              </span>
+                              <span 
+                                className="text-[#909090] text-xs"
+                                style={{ fontFamily: 'Arial, Helvetica, sans-serif' }}
+                              >
+                                {meaning}
+                              </span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Footer: Branding + TMDB */}
+                  <div className="flex items-center justify-between px-4 py-2 border-t border-[#2a2a3a] bg-[#0a0a0f]">
+                    <div className="flex items-center gap-1.5">
+                      <div className="w-4 h-4 rounded-full bg-[#d4af37]/20 flex items-center justify-center">
+                        <svg className="w-2 h-2 text-[#d4af37]" viewBox="0 0 24 24" fill="currentColor">
+                          <polygon points="12,2 15,8 22,9 17,14 18,21 12,18 6,21 7,14 2,9 9,8" />
+                        </svg>
+                      </div>
+                      <span 
+                        className="text-[#f5f5f0] text-xs font-bold"
                         style={{ fontFamily: 'Georgia, "Times New Roman", Times, serif' }}
                       >
-                        "{reviewText}"
-                      </p>
-                    )}
-                    
-                    {/* TMDB attribution */}
-                    <div className="mt-auto">
-                      <span className="text-[#505060] text-xs">
-                        TMDB
+                        Movie Club
                       </span>
                     </div>
+                    <span className="text-[#505060] text-xs">
+                      Film data: TMDB
+                    </span>
                   </div>
                 </div>
               )}

@@ -50,7 +50,7 @@ const ReviewCard = ({ review, onEdit, onDelete, onShare, benchmarks }) => {
               
               {/* Genres */}
               {movieData.genres && movieData.genres.length > 0 && (
-                <p className="text-slate text-xs mt-1">
+                <p className="text-silver text-xs mt-1">
                   {movieData.genres.map(g => g.name).join(', ')}
                 </p>
               )}
