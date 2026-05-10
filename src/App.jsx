@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useTMDB } from './hooks/useTMDB';
-import { useLocalReviews } from './hooks/useLocalReviews';
+import { useSupabaseReviews } from './hooks/useSupabaseReviews';
+import { useAuth } from './contexts/AuthContext';
 import FilmSearch from './components/FilmSearch';
 import SpaceReviewForm from './components/SpaceReviewForm';
 import SpaceRadarChart from './components/SpaceRadarChart';
@@ -8,12 +9,15 @@ import CalibrationStats from './components/CalibrationStats';
 import ReviewCard from './components/ReviewCard';
 import DimensionDeepDive from './components/DimensionDeepDive';
 import ShareableReview from './components/ShareableReview';
+import AuthPage from './components/AuthPage';
 import { SEED_REVIEWS } from './seedData';
 
 const App = () => {
+  const { user, loading: authLoading, signOut } = useAuth();
   const tmdb = useTMDB();
   const {
     calibration,
+    loading: reviewsLoading,
     saveReview,
     getReview,
     getAllReviews,
@@ -22,7 +26,7 @@ const App = () => {
     getCalibrationNudge,
     loadSeedData,
     getBenchmarkModes,
-  } = useLocalReviews();
+  } = useSupabaseReviews(user?.id);
 
   const [view, setView] = useState('home'); // 'home' | 'review' | 'my-reviews'
   const [selectedMovie, setSelectedMovie] = useState(null);
@@ -111,6 +115,34 @@ const App = () => {
   const percentages = getCalibrationPercentages();
   const nudge = getCalibrationNudge();
 
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-midnight flex items-center justify-center">
+        <div className="noise-overlay" />
+        <div className="text-center">
+          <div className="w-12 h-12 mx-auto mb-4 rounded-full border-2 border-gold border-t-transparent animate-spin" />
+          <p className="text-silver text-sm">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <AuthPage />;
+  }
+
+  if (reviewsLoading) {
+    return (
+      <div className="min-h-screen bg-midnight flex items-center justify-center">
+        <div className="noise-overlay" />
+        <div className="text-center">
+          <div className="w-12 h-12 mx-auto mb-4 rounded-full border-2 border-gold border-t-transparent animate-spin" />
+          <p className="text-silver text-sm">Loading your reviews...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-midnight">
       {/* Noise overlay */}
@@ -156,6 +188,12 @@ const App = () => {
                     {reviews.length}
                   </span>
                 )}
+              </button>
+              <button
+                onClick={signOut}
+                className="text-sm font-medium text-silver hover:text-cream transition-colors"
+              >
+                Sign Out
               </button>
             </nav>
           </div>
