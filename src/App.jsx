@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useTMDB } from './hooks/useTMDB';
 import { useSupabaseReviews } from './hooks/useSupabaseReviews';
 import { useAuth } from './contexts/AuthContext';
+import { useClubs } from './hooks/useClubs';
 import FilmSearch from './components/FilmSearch';
 import SpaceReviewForm from './components/SpaceReviewForm';
 import SpaceRadarChart from './components/SpaceRadarChart';
@@ -10,10 +11,15 @@ import ReviewCard from './components/ReviewCard';
 import DimensionDeepDive from './components/DimensionDeepDive';
 import ShareableReview from './components/ShareableReview';
 import AuthPage from './components/AuthPage';
+import ProfileSetup from './components/ProfileSetup';
+import ClubList from './components/ClubList';
+import ClubView from './components/ClubView';
+import JoinClub from './components/JoinClub';
+import FilmComparison from './components/FilmComparison';
 import { SEED_REVIEWS } from './seedData';
 
 const App = () => {
-  const { user, loading: authLoading, signOut } = useAuth();
+  const { user, profile, loading: authLoading, signOut } = useAuth();
   const tmdb = useTMDB();
   const {
     calibration,
@@ -28,13 +34,43 @@ const App = () => {
     getBenchmarkModes,
   } = useSupabaseReviews(user?.id);
 
-  const [view, setView] = useState('home'); // 'home' | 'review' | 'my-reviews'
+  const {
+    clubs,
+    loading: clubsLoading,
+    createClub,
+    joinClub,
+    getClubMembers,
+    leaveClub,
+    deleteClub,
+    getInviteLink,
+  } = useClubs(user?.id);
+
+  const [view, setView] = useState('home');
   const [selectedMovie, setSelectedMovie] = useState(null);
   const [selectedMovieDetails, setSelectedMovieDetails] = useState(null);
   const [existingReview, setExistingReview] = useState(null);
   const [selectedDimension, setSelectedDimension] = useState(null);
   const [showAbout, setShowAbout] = useState(false);
   const [shareReview, setShareReview] = useState(null);
+
+  // Club state
+  const [selectedClub, setSelectedClub] = useState(null);
+  const [selectedFilmComparison, setSelectedFilmComparison] = useState(null);
+  const [comparisonMembers, setComparisonMembers] = useState(null);
+  const [pendingJoinCode, setPendingJoinCode] = useState(null);
+  const [joinLoading, setJoinLoading] = useState(false);
+  const [joinError, setJoinError] = useState(null);
+
+  // Check for invite link on load
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const joinCode = params.get('join');
+    if (joinCode) {
+      setPendingJoinCode(joinCode);
+      // Clean URL
+      window.history.replaceState({}, '', window.location.pathname);
+    }
+  }, []);
 
   // Fetch movie details when a movie is selected
   useEffect(() => {
@@ -104,11 +140,57 @@ const App = () => {
   const handleFilterByPeak = (dimension) => {
     setSelectedDimension(null);
     setView('my-reviews');
-    // Future: could add a filter state here
   };
 
   const handleShareReview = (review) => {
     setShareReview(review);
+  };
+
+  // Club handlers
+  const handleCreateClub = async (name) => {
+    await createClub(name, profile.display_name);
+  };
+
+  const handleSelectClub = (club) => {
+    setSelectedClub(club);
+    setView('club-detail');
+  };
+
+  const handleSelectFilm = (film, members) => {
+    setSelectedFilmComparison(film);
+    setComparisonMembers(members);
+    setView('film-comparison');
+  };
+
+  const handleBackToClubs = () => {
+    setSelectedClub(null);
+    setSelectedFilmComparison(null);
+    setComparisonMembers(null);
+    setView('clubs');
+  };
+
+  const handleBackToClubView = () => {
+    setSelectedFilmComparison(null);
+    setComparisonMembers(null);
+    setView('club-detail');
+  };
+
+  const handleJoinClub = async (inviteCode) => {
+    setJoinLoading(true);
+    setJoinError(null);
+    try {
+      await joinClub(inviteCode, profile.display_name);
+      setPendingJoinCode(null);
+      setView('clubs');
+    } catch (err) {
+      setJoinError(err.message);
+    } finally {
+      setJoinLoading(false);
+    }
+  };
+
+  const handleCancelJoin = () => {
+    setPendingJoinCode(null);
   };
 
   const reviews = getAllReviews();
@@ -128,7 +210,27 @@ const App = () => {
   }
 
   if (!user) {
+    // If there's a pending join code, pass it through auth
+    if (pendingJoinCode) {
+      return <AuthPage />;
+    }
     return <AuthPage />;
+  }
+
+  if (!profile) {
+    return <ProfileSetup />;
+  }
+
+  // Show join confirmation if there's a pending invite
+  if (pendingJoinCode) {
+    return (
+      <JoinClub
+        inviteCode={pendingJoinCode}
+        onJoin={handleJoinClub}
+        onCancel={handleCancelJoin}
+        loading={joinLoading}
+      />
+    );
   }
 
   if (reviewsLoading) {
@@ -171,7 +273,7 @@ const App = () => {
               <button
                 onClick={() => setView('home')}
                 className={`text-sm font-medium transition-colors ${
-                  view === 'home' ? 'text-gold' : 'text-silver hover:text-cream'
+                  view === 'home' || view === 'review' ? 'text-gold' : 'text-silver hover:text-cream'
                 }`}
               >
                 Review
@@ -186,6 +288,20 @@ const App = () => {
                 {reviews.length > 0 && (
                   <span className="ml-2 px-2 py-0.5 bg-gold/20 text-gold text-xs rounded-full">
                     {reviews.length}
+                  </span>
+                )}
+              </button>
+              <button
+                onClick={() => { setView('clubs'); setSelectedClub(null); setSelectedFilmComparison(null); }}
+                className={`text-sm font-medium transition-colors ${
+                  view === 'clubs' || view === 'club-detail' || view === 'film-comparison'
+                    ? 'text-gold' : 'text-silver hover:text-cream'
+                }`}
+              >
+                Clubs
+                {clubs.length > 0 && (
+                  <span className="ml-2 px-2 py-0.5 bg-gold/20 text-gold text-xs rounded-full">
+                    {clubs.length}
                   </span>
                 )}
               </button>
@@ -371,6 +487,40 @@ const App = () => {
             </div>
           </div>
         )}
+
+        {/* Clubs list view */}
+        {view === 'clubs' && (
+          <ClubList
+            clubs={clubs}
+            loading={clubsLoading}
+            onCreateClub={handleCreateClub}
+            onSelectClub={handleSelectClub}
+            getInviteLink={getInviteLink}
+          />
+        )}
+
+        {/* Club detail view */}
+        {view === 'club-detail' && selectedClub && (
+          <ClubView
+            club={selectedClub}
+            userId={user.id}
+            onBack={handleBackToClubs}
+            onSelectFilm={handleSelectFilm}
+            getInviteLink={getInviteLink}
+            onLeave={leaveClub}
+            onDelete={deleteClub}
+          />
+        )}
+
+        {/* Film comparison view */}
+        {view === 'film-comparison' && selectedFilmComparison && comparisonMembers && (
+          <FilmComparison
+            film={selectedFilmComparison}
+            members={comparisonMembers}
+            userId={user.id}
+            onBack={handleBackToClubView}
+          />
+        )}
       </main>
 
       {/* Footer */}
@@ -394,7 +544,7 @@ const App = () => {
                 This product uses the TMDB API but is not endorsed or certified by TMDB.
               </p>
             </div>
-            
+
             {/* App info */}
             <div className="text-center md:text-right">
               <p className="text-silver text-sm">Movie Club — SPACE Reviews</p>
@@ -422,7 +572,7 @@ const App = () => {
       {/* About Modal */}
       {showAbout && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div 
+          <div
             className="absolute inset-0 bg-midnight/90 backdrop-blur-sm"
             onClick={() => setShowAbout(false)}
           />
@@ -435,21 +585,21 @@ const App = () => {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
-            
+
             <h2 className="font-display text-2xl text-cream mb-4">About Movie Club</h2>
-            
+
             <div className="space-y-4 text-silver text-sm">
               <p>
-                <strong className="text-cream">Movie Club</strong> replaces simplistic star ratings with 
+                <strong className="text-cream">Movie Club</strong> replaces simplistic star ratings with
                 SPACE—a five-axis framework measuring Story, Pageantry, Amusement, Captivation, and Emotion.
               </p>
-              
+
               <p>
-                The framework emerged from a simple observation: comparing a Hallmark Christmas film 
-                to Schindler's List on a single axis is meaningless. Films optimize for different things. 
+                The framework emerged from a simple observation: comparing a Hallmark Christmas film
+                to Schindler's List on a single axis is meaningless. Films optimize for different things.
                 SPACE lets each film succeed on its own terms.
               </p>
-              
+
               <div className="pt-4 border-t border-slate">
                 <h3 className="text-cream font-medium mb-2">Credits</h3>
                 <ul className="space-y-2">
@@ -457,7 +607,7 @@ const App = () => {
                   <li>Built with React, Tailwind CSS, Recharts</li>
                 </ul>
               </div>
-              
+
               <div className="pt-4 border-t border-slate">
                 <h3 className="text-cream font-medium mb-3">Film Data Attribution</h3>
                 <div className="flex items-start gap-4 bg-slate/20 rounded-lg p-4">
@@ -473,13 +623,13 @@ const App = () => {
                     />
                   </a>
                   <p className="text-xs text-slate flex-1">
-                    This product uses the TMDB API but is not endorsed or certified by TMDB. 
+                    This product uses the TMDB API but is not endorsed or certified by TMDB.
                     Film metadata, posters, and search powered by The Movie Database.
                   </p>
                 </div>
               </div>
             </div>
-            
+
             <button
               onClick={() => setShowAbout(false)}
               className="w-full mt-6 py-3 bg-slate hover:bg-slate/80 text-cream font-medium rounded-lg transition-colors"
