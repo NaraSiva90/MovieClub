@@ -41,37 +41,48 @@ export const SCORE_LABELS = {
 // - overallMode: { S, P, A, C, E } - optional, user's overall mode
 // - showBenchmarks: boolean - whether to show benchmark layers
 // - showLegend: boolean - whether to show legend below chart
-const SpaceRadarChart = ({ 
-  scores, 
-  size = 300, 
-  showLabels = true, 
-  showDots = true, 
+const SpaceRadarChart = ({
+  scores,
+  size = 300,
+  showLabels = true,
+  showDots = true,
   colorCoded = false,
   genreMode = null,
   genreModeLabel = null,
   overallMode = null,
   showBenchmarks = false,
   showLegend = false,
+  memberScores = null,
+  showMemberLegend = false,
+  currentUserName = 'You',
+  currentUserColor = '#d4af37',
 }) => {
   const DIMENSIONS = ['S', 'P', 'A', 'C', 'E'];
-  
+
   // Build data with all layers
   const data = DIMENSIONS.map((key) => {
     const entry = {
       key,
       axis: colorCoded ? key : (showLabels ? SPACE_LABELS[key] : key),
-      value: scores[key] || 0,
+      value: scores ? (scores[key] || 0) : 0,
       fullMark: 5,
     };
-    
+
     if (showBenchmarks && genreMode) {
       entry.genreMode = genreMode[key] || 0;
     }
-    
+
     if (showBenchmarks && overallMode) {
       entry.overallMode = overallMode[key] || 0;
     }
-    
+
+    // Add member scores as separate data keys
+    if (memberScores) {
+      memberScores.forEach((member, idx) => {
+        entry[`member_${idx}`] = member.scores[key] || 0;
+      });
+    }
+
     return entry;
   });
 
@@ -203,21 +214,39 @@ const SpaceRadarChart = ({
               />
             )}
             
+            {/* Member score layers */}
+            {memberScores && memberScores.map((member, idx) => (
+              <Radar
+                key={`member_${idx}`}
+                name={member.name}
+                dataKey={`member_${idx}`}
+                stroke={member.color}
+                strokeDasharray="5 3"
+                fill={member.color}
+                fillOpacity={0.1}
+                strokeWidth={1.5}
+                strokeOpacity={0.7}
+                dot={false}
+              />
+            ))}
+
             {/* Main rating layer (top - most prominent) */}
-            <Radar
-              name="SPACE"
-              dataKey="value"
-              stroke="#d4af37"
-              fill="#d4af37"
-              fillOpacity={0.3}
-              strokeWidth={2}
-              dot={showDots ? {
-                r: 4,
-                fill: '#d4af37',
-                stroke: '#f0d878',
-                strokeWidth: 2,
-              } : false}
-            />
+            {scores && (
+              <Radar
+                name="SPACE"
+                dataKey="value"
+                stroke={memberScores ? currentUserColor : '#d4af37'}
+                fill={memberScores ? currentUserColor : '#d4af37'}
+                fillOpacity={0.3}
+                strokeWidth={2}
+                dot={showDots ? {
+                  r: 4,
+                  fill: memberScores ? currentUserColor : '#d4af37',
+                  stroke: memberScores ? currentUserColor : '#f0d878',
+                  strokeWidth: 2,
+                } : false}
+              />
+            )}
             
             {!colorCoded && <Tooltip content={<CustomTooltip />} />}
           </RadarChart>
@@ -229,9 +258,9 @@ const SpaceRadarChart = ({
         <div className="flex flex-wrap justify-center gap-3 mt-2 text-xs">
           {legendItems.map((item, idx) => (
             <div key={idx} className="flex items-center gap-1.5">
-              <div 
+              <div
                 className="w-4 h-0.5"
-                style={{ 
+                style={{
                   backgroundColor: item.color,
                   borderStyle: item.style === 'dashed' ? 'dashed' : item.style === 'dotted' ? 'dotted' : 'solid',
                   borderWidth: item.style !== 'solid' ? '1px' : 0,
@@ -255,6 +284,28 @@ const SpaceRadarChart = ({
                 </svg>
               )}
               <span style={{ color: item.color }}>{item.label}</span>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Member legend */}
+      {showMemberLegend && memberScores && (
+        <div className="flex flex-wrap justify-center gap-3 mt-2 text-xs">
+          {scores && (
+            <div className="flex items-center gap-1.5">
+              <svg width="16" height="2">
+                <line x1="0" y1="1" x2="16" y2="1" stroke={currentUserColor} strokeWidth="2" />
+              </svg>
+              <span style={{ color: currentUserColor }}>{currentUserName}</span>
+            </div>
+          )}
+          {memberScores.map((member, idx) => (
+            <div key={idx} className="flex items-center gap-1.5">
+              <svg width="16" height="2">
+                <line x1="0" y1="1" x2="16" y2="1" stroke={member.color} strokeWidth="2" strokeDasharray="4 2" />
+              </svg>
+              <span style={{ color: member.color }}>{member.name}</span>
             </div>
           ))}
         </div>
